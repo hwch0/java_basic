@@ -36,7 +36,7 @@ public class BeepPrintExample2 {
 				Thread.sleep(500); // 0.5초 씩 일시정지 (Interrupted예외 발생)
 			} catch (InterruptedException e) {
 			}
-		}
+		} 
 		
 		}
 }

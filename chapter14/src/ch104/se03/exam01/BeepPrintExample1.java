@@ -28,6 +28,5 @@ public class BeepPrintExample1 {
 			} catch (InterruptedException e) {
 			}
 		}
-		
 		}
 }
