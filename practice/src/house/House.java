@@ -66,6 +66,29 @@ public class House {
 		return roomNo-1;
 		
 	}
+	
+	
+	public Room makeMainRoom2() {
+		room = new Room() {
+			@Override
+			void openWindow() {
+				System.out.println("안방 창문을 엽니다.");
+			}
+			@Override
+			void closeWindow() {
+				System.out.println("안방 창문을 닫습니다.");
+			}
+			
+		};
+		roomList.add(room);
+		roomNo++;
+		System.out.println("안방을 만들었습니다. 현재 방의 개수 : " + roomNo);
+		
+		return room;
+		
+	}
+	
+	
 	// 작은방 만들고 방번호 return 
 	// 방 객체를 만들면서 창문 메서드 재정의
 	public int makeSubRoom() {

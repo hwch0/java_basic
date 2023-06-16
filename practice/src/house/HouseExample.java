@@ -11,30 +11,38 @@ public class HouseExample {
 		// 집 객체 생성
 		House myHouse = new House();
 		
+		House.Room smallRoom = myHouse.makeMainRoom2();
+		smallRoom.openDoor();
+		smallRoom.openWindow();
+		smallRoom.closeDoor();
+		smallRoom.closeWindow();
+		
 		// 안방 만들기
-		int mainRoomNo = myHouse.makeMainRoom();
-		
-		// 작은방 만들기
-		int subRoomNo = myHouse.makeSubRoom();
-		
-		// 방 조회
-		myHouse.printAllRooms();
-		
-		// 안방 문 열고 닫기
-		myHouse.getRoom(mainRoomNo).openDoor();
-		myHouse.getRoom(mainRoomNo).closeDoor();
-		
-		// 안방 창문 열고 닫기
-		myHouse.getRoom(mainRoomNo).openWindow();
-		myHouse.getRoom(mainRoomNo).closeWindow();
-		
-		// 작은방 문 열고 닫기
-		myHouse.getRoom(subRoomNo).openDoor();
-		myHouse.getRoom(subRoomNo).closeDoor();
-		
-		// 작은방 창문 열고 닫기
-		myHouse.getRoom(subRoomNo).openWindow();
-		myHouse.getRoom(subRoomNo).closeWindow();
+//		int mainRoomNo = myHouse.makeMainRoom();
+//		
+//		// 작은방 만들기
+//		int subRoomNo = myHouse.makeSubRoom();
+//		
+//		// 방 조회
+//		myHouse.printAllRooms();
+//		
+//		// 안방 문 열고 닫기
+//		myHouse.getRoom(mainRoomNo).openDoor();
+//		myHouse.getRoom(mainRoomNo).closeDoor();
+//		
+//		// 안방 창문 열고 닫기
+//		myHouse.getRoom(mainRoomNo).openWindow();
+//		myHouse.getRoom(mainRoomNo).closeWindow();
+//		
+//		// 작은방 문 열고 닫기
+//		myHouse.getRoom(subRoomNo).openDoor();
+//		myHouse.getRoom(subRoomNo).closeDoor();
+//		
+//		// 작은방 창문 열고 닫기
+//		myHouse.getRoom(subRoomNo).openWindow();
+//		myHouse.getRoom(subRoomNo).closeWindow();
 	}
+	
+//	작은방.openWindow()
 
 }
