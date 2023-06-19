@@ -23,7 +23,7 @@ public class MemberDB implements MemberInterface {
 	// 서버에서 String으로 넘겨주는 데이터를 JSON 혹은 객체 타입으로 변환 후 File로 저장
 	// 서버에서 요청하는 데이터를 객체 -> JSON -> String으로 변환하여 전달
 	final String fileName = "C:/Users/KOSA/Temp/member.db";
-	final String fileName2 = "C:/Users/KOSA/Temp/member2.db";
+	final String fileName2 = "C:/Users/KOSA/Temp/memberNew.db";
 	final File file = new File(fileName);
 	final File file2 = new File(fileName2);
 	ObjectOutputStream oos;
@@ -33,7 +33,7 @@ public class MemberDB implements MemberInterface {
 	@Override
 	public void saveMemberList(Map<String, Member> memberMap) {
 		try {
-			oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(fileName)));
+			oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file2)));
 			oos.writeObject(memberMap);
 			oos.close();
 		} catch (IOException e) {
@@ -58,13 +58,26 @@ public class MemberDB implements MemberInterface {
 			e.printStackTrace();
 		}
 	}
+	
+	public void saveMember(JSONObject member) {
+		Member newMember = Member.makeMember(member);
+		try {
+			oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file2)));
+			oos.writeObject(newMember);
+			oos.close();
+		} catch (IOException e) {
+			System.out.println("saveFileMember" + " 예외발생");
+			e.printStackTrace();
+		}
+		
+	}
 
 	@Override
 	public Member findMember(String uid) {
 		
 		ObjectInputStream ois;
 		try {
-			ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(fileName2)));
+			ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file2)));
 			Map<String, Member> memberMap = (Map<String, Member>) ois.readObject();
 			Collection<Member> memberList = memberMap.values();
 			for(Member m : memberList) {
@@ -86,7 +99,7 @@ public class MemberDB implements MemberInterface {
 		String targetId = jsonObject.getString("uid");
 		ObjectInputStream ois;
 		try {
-			ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(fileName2)));
+			ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file2)));
 			Map<String, Member> memberMap = (Map<String, Member>) ois.readObject();
 			Collection<Member> memberList = memberMap.values();
 			for(Member m : memberList) {
@@ -107,7 +120,7 @@ public class MemberDB implements MemberInterface {
 	@Override
 	public void readAllMembers() {
 		try {
-			ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(fileName2)));
+			ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file2)));
 			Map<String, Member> memberMap = (Map<String, Member>) ois.readObject();
 			Collection<Member> memberList = memberMap.values();
 			
@@ -129,9 +142,13 @@ public class MemberDB implements MemberInterface {
 		Map<String, Member> memberMap = null;
 		try {
 			if(file.exists() && file.length() > 0) {
-				ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(fileName2)));
+				ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file2)));
+				
+				
 				memberMap = (Map<String, Member>) ois.readObject();
+				System.out.println(memberMap.toString());
 			} else {
+				System.out.println("멤버 목록 없음");
 				memberMap = new HashMap<String, Member>();
 			}
 			

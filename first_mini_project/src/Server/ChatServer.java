@@ -1,7 +1,11 @@
 package Server;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Collection;
@@ -13,14 +17,52 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import Member.MemberDB;
+import chatting.Member;
 
 public class ChatServer {
 	// 필드
 	ServerSocket serverSocket; 
 	ExecutorService threadPool = Executors.newFixedThreadPool(100); // 해당 프로그램에 동시에 접속해서 작업할 수 있는 최대 인원
-	Map<String,SocketClient> connectedMembers = Collections.synchronizedMap(new HashMap<>()); // 현재 프로그램에 접속한 인원
+	Map<String, SocketClient> connectedMembers = Collections.synchronizedMap(new HashMap<>()); // 현재 프로그램에 접속한 인원
+	Map<String, Member> memberList = Collections.synchronizedMap(new HashMap<>()); // 현재 가입한 인원
+	
 	// DB (회원목록, 채팅목록)
 	final MemberDB memberDB = new MemberDB();
+	final String fileName2 = "C:/Users/KOSA/Temp/memberNew.db";
+	File file2 = new File(fileName2);
+	ObjectOutputStream oos;
+	ObjectInputStream ois;
+	
+	// 회원목록 hashMap으로 가져오는 함수
+//	public Map<String, Member> readAllmembers() {
+	public void readAllmembers() {
+		
+	      if (file2.exists()){
+	    	  
+	  		try {
+				ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file2)));
+				
+//				System.out.println(ois.readObject().getClass());
+//				System.out.println(ois.readObject());
+				
+				memberList = (Map<String, Member>) ois.readObject();
+				ois.close();
+			} catch (IOException|ClassNotFoundException e) {
+				System.out.println("findMember" + " 예외 발생");
+				e.printStackTrace();
+			} 
+			System.out.println("모든 멤버 출력"  + memberList);
+//			Map<String, Member> memberMap = null;
+//			return memberMap;
+	    	  
+	    	  
+	      } else {
+	            memberList  = new HashMap<>();
+	            System.out.println("회원 정보 파일이 존재하지 않아 빈 회원 목록으로 초기화했습니다.");
+
+	      }
+	}
+	
 	
 	// 메소드: 서버 시작
 	public void start() throws IOException {
@@ -40,6 +82,7 @@ public class ChatServer {
 			}
 		});
 		thread.start();
+		readAllmembers();
 	}
 	// 메소드: 클라이언트 연결시 connectedMembers 배열에 SocketClient 객체 추가
 	public void addSocketClient(SocketClient socketClient) {
