@@ -1,4 +1,4 @@
-package chatting;
+package Member;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -19,6 +19,7 @@ public class Member implements Serializable {
 	private String phoneNumber;
 	private String address;
 	private String gender; // 'F', 'M'
+	private Boolean type; // true or false
 	
 	public JSONObject makeJSON() {
 		JSONObject jsonObject = new JSONObject();
@@ -29,6 +30,7 @@ public class Member implements Serializable {
 		jsonObject.put("phoneNumber", phoneNumber);
 		jsonObject.put("address", address);
 		jsonObject.put("gender", gender);
+		jsonObject.put("type", type);
 		
 		return jsonObject;
 	}
@@ -42,6 +44,7 @@ public class Member implements Serializable {
 		member.setPhoneNumber(jsonObject.getString("phoneNumber"));
 		member.setAddress(jsonObject.getString("address"));
 		member.setGender(jsonObject.getString("gender"));
+		member.setType(jsonObject.getBoolean("type"));
 		return member;
 	}
 	
@@ -60,7 +63,7 @@ public class Member implements Serializable {
 		Member other = (Member) obj;
 		return Objects.equals(uid, other.uid);
 	}
-	public Member(String uid, String name, String pwd, int age, String phoneNumber, String address, String gender) {
+	public Member(String uid, String name, String pwd, int age, String phoneNumber, String address, String gender, boolean type) {
 		super();
 		this.uid = uid;
 		this.name = name;
@@ -69,6 +72,7 @@ public class Member implements Serializable {
 		this.phoneNumber = phoneNumber;
 		this.address = address;
 		this.gender = gender;
+		this.type = type;
 	}
 
 	public Member() {

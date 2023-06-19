@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,20 +17,23 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import Member.MemberDB;
-import chatting.Member;
+import Member.Member;
+import Member.Room;
 
 public class ChatServer {
 	// 필드
-	ServerSocket serverSocket; 
+	ServerSocket serverSocket = null;; 
 	ExecutorService threadPool = Executors.newFixedThreadPool(100); // 해당 프로그램에 동시에 접속해서 작업할 수 있는 최대 인원
 	Map<String, SocketClient> connectedMembers = Collections.synchronizedMap(new HashMap<>()); // 현재 프로그램에 접속한 인원
 	Map<String, Member> memberList = Collections.synchronizedMap(new HashMap<>()); // 현재 가입한 인원
+	Map<Integer, Room> chatRooms = Collections.synchronizedMap(new HashMap<>()); // 채팅방 목록
 	
 	// DB (회원목록, 채팅목록)
 	final MemberDB memberDB = new MemberDB();
-	final String fileName2 = "C:/Users/KOSA/Temp/memberNew.db";
+	final String fileName2 = "C:/Users/KOSA/Temp/memberNew.db"; // 회원 목록
+	final String fileName3 = "C:/Users/KOSA/Temp/chatRooms.db"; // 채팅방 목록
 	File file2 = new File(fileName2);
+	File file3 = new File(fileName3);
 	ObjectOutputStream oos;
 	ObjectInputStream ois;
 	
@@ -41,48 +45,73 @@ public class ChatServer {
 	    	  
 	  		try {
 				ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file2)));
-				
-//				System.out.println(ois.readObject().getClass());
-//				System.out.println(ois.readObject());
-				
 				memberList = (Map<String, Member>) ois.readObject();
 				ois.close();
 			} catch (IOException|ClassNotFoundException e) {
-				System.out.println("findMember" + " 예외 발생");
+				System.out.println("readAllmembers()" + " 예외 발생");
 				e.printStackTrace();
 			} 
-			System.out.println("모든 멤버 출력"  + memberList);
-//			Map<String, Member> memberMap = null;
-//			return memberMap;
-	    	  
+	  		System.out.println("-----------------------------------------------------------------");
+	  		System.out.println(" NO.|                    MEMBER DATA      			              ");
+	  		System.out.println("-----------------------------------------------------------------");
+	  		int no = 1;
+	  		for(Member m : memberList.values()) {
+	  			System.out.println(" " + no +" | "+m);
+	  		}
 	    	  
 	      } else {
 	            memberList  = new HashMap<>();
-	            System.out.println("회원 정보 파일이 존재하지 않아 빈 회원 목록으로 초기화했습니다.");
-
+	            System.out.println("회원정보 목록 초기화");
+	      }
+	}
+	
+	
+	public void readAllrooms() {
+		
+	      if (file3.exists()){
+	  		try {
+				ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file3)));
+				chatRooms = (Map<Integer, Room>) ois.readObject();
+				ois.close();
+			} catch (IOException|ClassNotFoundException e) {
+				System.out.println("readAllrooms()" + " 예외 발생");
+				e.printStackTrace();
+			} 
+	  		System.out.println("-----------------------------------------------------------------");
+	  		System.out.println(" NO.|                      CHATTING DATA       	               ");
+	  		System.out.println("-----------------------------------------------------------------");
+	  		int no = 1;
+	  		for(Room r : chatRooms.values()) {
+	  			System.out.println(" " + no +" | "+r);
+	  		}
+	    	  
+	      } else {
+	            memberList  = new HashMap<>();
+	            System.out.println("채팅방 목록 초기화");
 	      }
 	}
 	
 	
 	// 메소드: 서버 시작
-	public void start() throws IOException {
+	public void start() throws IOException{
 		serverSocket = new ServerSocket(50001);
-		System.out.println("[서버] 시작됨");
+		System.out.println("[서버] 시작");
 		
 		Thread thread = new Thread(() -> {
-			while(true) {
+			try {
+				while(true) {
 				Socket socket;
-				try {
 					socket = serverSocket.accept();
 					SocketClient sc = new SocketClient(this, socket);
+				}
 				} catch (IOException e) {
 					System.out.println("서버 start() 오류");
-					e.printStackTrace();
+//					e.printStackTrace();
 				}
-			}
 		});
 		thread.start();
 		readAllmembers();
+//		readAllrooms();
 	}
 	// 메소드: 클라이언트 연결시 connectedMembers 배열에 SocketClient 객체 추가
 	public void addSocketClient(SocketClient socketClient) {
@@ -123,20 +152,20 @@ public class ChatServer {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SocketException {
 		
 		try {
 			ChatServer chatServer = new ChatServer();
 			chatServer.start();
 			
-			System.out.println("----------------------------------------------------");
+	  		System.out.println("-----------------------------------------------------------------");
 			System.out.println("서버를 종료하려면 q를 입력하고 Enter.");
-			System.out.println("----------------------------------------------------");
+			System.out.println("-----------------------------------------------------------------");
 			
 			Scanner scanner = new Scanner(System.in);
 			while(true) {
 				String key = scanner.nextLine();
-				if(key.equals("q")) break;
+				if(key.equalsIgnoreCase("q")) break;
 			}
 			scanner.close(); // Scanner close 하는 이유...
 			chatServer.stop();

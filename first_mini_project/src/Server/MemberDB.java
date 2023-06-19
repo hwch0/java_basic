@@ -1,4 +1,4 @@
-package Member;
+package Server;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -16,21 +16,39 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
-import chatting.Member;
+import Member.Member;
+import Member.Room;
 
-public class MemberDB implements MemberInterface {
+public class MemberDB  {
 	// DB 접근과 관련된 CRUD 기능 구현
 	// 서버에서 String으로 넘겨주는 데이터를 JSON 혹은 객체 타입으로 변환 후 File로 저장
 	// 서버에서 요청하는 데이터를 객체 -> JSON -> String으로 변환하여 전달
 	final String fileName = "C:/Users/KOSA/Temp/member.db";
 	final String fileName2 = "C:/Users/KOSA/Temp/memberNew.db";
+	final String fileName3 = "C:/Users/KOSA/Temp/chatRooms.db";
 	final File file = new File(fileName);
 	final File file2 = new File(fileName2);
+	final File file3 = new File(fileName3);
 	ObjectOutputStream oos;
 	ObjectInputStream ois;
 
 								/*DB 접근용 함수*/
-	@Override
+	// 채팅방 목록을 파일 객체로 저장
+	public void saveRoomList(int roomCnt, Room newRoom) {
+		Map<Integer, Room> roomMap = new HashMap<>();
+		roomMap.put(roomCnt, newRoom);
+		try {
+			oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file3)));
+			oos.writeObject(roomMap);
+			oos.close();
+		} catch (IOException e) {
+			System.out.println("saveRoomList" + " 예외발생");
+			e.printStackTrace();
+		}
+	}
+	
+	
+	// 회원정보 리스트를 파일 객체로 저장 (사용)
 	public void saveMemberList(Map<String, Member> memberMap) {
 		try {
 			oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file2)));
@@ -42,7 +60,6 @@ public class MemberDB implements MemberInterface {
 		}
 	}
 	// json으로 받은 memberMap을 다시 Hashmap으로 변환해서 파일로 저장
-	@Override
 	public void saveMemberList(JSONObject memberMap) {
 //		System.out.println("saveMemberList() 메서드 실행");
 //        JSONObject jsonObject = new JSONObject(memberMap);
@@ -72,7 +89,6 @@ public class MemberDB implements MemberInterface {
 		
 	}
 
-	@Override
 	public Member findMember(String uid) {
 		
 		ObjectInputStream ois;
@@ -94,7 +110,6 @@ public class MemberDB implements MemberInterface {
 
 	}
 	
-	@Override
 	public Member findMember(JSONObject jsonObject) {
 		String targetId = jsonObject.getString("uid");
 		ObjectInputStream ois;
@@ -115,9 +130,7 @@ public class MemberDB implements MemberInterface {
 		return null;
 		
 	}
-	
 
-	@Override
 	public void readAllMembers() {
 		try {
 			ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file2)));
@@ -161,13 +174,11 @@ public class MemberDB implements MemberInterface {
 		
 	}
 
-	@Override
 	public void updateMember(String field) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
 	public void deleteMember(String uid) {
 		// TODO Auto-generated method stub
 
@@ -188,11 +199,9 @@ public class MemberDB implements MemberInterface {
 		return hashMap;
 	}
 	
-	// 로그인: 아이디, 비밀번호 확인 후 member 객체 전달
+	// 로그인: 아이디, 비밀번호 확인 후 member 객체 전달 (사용)
 	public Member checkMemberInfo(JSONObject jsonObject) {
 		Member targetMember = findMember(jsonObject);
-		
-		System.out.println("DB checkMemberInfo() 실행");
 		
 		if((targetMember!=null) 
 				&& (targetMember.getUid().equals(jsonObject.getString("uid"))) 

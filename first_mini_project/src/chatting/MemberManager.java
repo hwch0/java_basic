@@ -1,5 +1,4 @@
 package chatting;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -14,52 +13,74 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import Member.MemberDB;
+import org.json.JSONObject;
 
+import Client.ChatClient;
+import Member.Member;
+import Server.MemberDB;
+import lombok.Data;
+
+@Data
 public class MemberManager {
 	// MemberDB 객체 생성
 	static final MemberDB memberDB = new MemberDB();
 	
 	// 회원관리할 Map 컬렉션 생성 (static 멤버 변수)
-	static Map<String, Member> memberMap = new HashMap<>();
-	Member currentMember;
+//	static Map<String, Member> memberMap = new HashMap<>();
+	static Map<String, Member> memberMap = memberDB.getAllMembers();
+	ChatClient connectedMember;
+	public Member currentMember = null;
+	String currentId = "";
+	
+	public MemberManager(ChatClient connectedMember) {
+		this.connectedMember = connectedMember;
+	}
 	
 	public void choiceMenu() {
 		Scanner scanner = new Scanner(System.in);
 		boolean exit = true;
 		
 		while(exit) {
-			displayMenuBeforeLogin();
+			displayMenu();
 			int num = scanner.nextInt();
 			switch (num) {
 			case 1 -> insertMember(scanner); 
 			case 2 -> login(scanner);
 			case 3 -> findPwd(scanner);
-			case 4 -> exit = false;
+			case 4 -> updateInfo(scanner); 
+			case 5 -> createChattingRoom(scanner);
+			case 6 -> enterChattingRoom(scanner);
+			case 7 -> deleteMember(scanner);
+			case 8 -> printAllmembers(scanner);
+			case 9 -> {
+				exit = false;
+				logout(); 
+				System.out.println("로그아웃 되었습니다.");
+//				choiceMenu();
+			}
+			case 10 -> {
+				try {
+					connectedMember.unconnect();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				exit = false;
+			}
 			}
 		} System.out.println("프로그램이 종료 되었습니다.");
 	}
 	
-	public void choiceMenuAfterLogin() {
-		Scanner scanner = new Scanner(System.in);
-		boolean exit = true;
-		while(exit) {
-			displayMenuAfterLogin();
-			int num = scanner.nextInt();
-			switch (num) {
-			case 1 -> updateInfo(scanner); 
-			case 2 -> createChattingRoom(scanner);
-			case 3 -> enterChattingRoom(scanner);
-			case 4 -> deleteMember(scanner);
-			case 5 -> {
-				exit = false;
-				logout(); 
-//				choiceMenu();
-			}
-			}
-		}
+	private void printAllmembers(Scanner scanner) {
+		// memberMap json으로 변환
+        // JSONObject 객체를 생성합니다.
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("command", "getAllMembers");
+//        jsonObject.put("data", newMember);
+		
+        // 서버로 JSON 객체 전송
+        connectedMember.send(jsonObject);
 	}
-	
+
 	
 	private void logout() {
 		currentMember = null;
@@ -74,7 +95,7 @@ public class MemberManager {
 			memberMap.remove(currentMember.getUid());
 			memberDB.saveMemberList(memberMap);
 		} else {
-			choiceMenuAfterLogin();
+//			choiceMenuAfterLogin(currentId);
 		}
 	}
 
@@ -155,9 +176,6 @@ public class MemberManager {
 			}
 			}
 		}
-		
-		
-		
 	}
 
 	public void findPwd(Scanner scanner) {
@@ -165,61 +183,102 @@ public class MemberManager {
 		System.out.println("[비민번호 찾기]");
 		System.out.println("아이디 >>> ");
 		String uid = scanner.next();
-		System.out.println("이름 >>> ");
-		String name = scanner.next();
+		System.out.println("핸드폰 번호 >>> ");
+		String phoneNumber = scanner.next();
 		
-		Member findMember = memberDB.findMember(uid);
-		if((findMember != null) && (name.equals(findMember.getName()))) {
-			System.out.println(uid + "님의 비밀번호는 [" + findMember.getPwd() + "] 입니다.");
-		} else {
-			System.out.println("존재하지 않는 회원입니다.");
-		}
+        // 찾을 ID를 서버로 전송하여 가입여부 확인 JSONObject 객체를 생성합니다.
+        JSONObject jsonObject = new JSONObject();
+        JSONObject memberInfo = new JSONObject();
+        memberInfo.put("uid", uid);
+        memberInfo.put("phoneNumber", phoneNumber);
+        jsonObject.put("command", "findPwd");
+        jsonObject.put("data", memberInfo);
+		
+        // 서버로 JSON 객체 전송
+        connectedMember.send(jsonObject);
+		
+		
+//		Member findMember = memberDB.findMember(uid);
+//		if((findMember != null) && (name.equals(findMember.getName()))) {
+//			System.out.println(uid + "님의 비밀번호는 [" + findMember.getPwd() + "] 입니다.");
+//		} else {
+//			System.out.println("존재하지 않는 회원입니다.");
+//		}
 	}
 
 	public void login(Scanner scanner) {
-		System.out.println("[로그인]");
-		System.out.println("아이디 >>> ");
-		String uid = scanner.next();
-		System.out.println("비밀번호 >>> ");
-		String pwd = scanner.next();
-		
-		Member findMember = memberDB.findMember(uid);
-		
-		if((findMember != null) && (pwd.equals(findMember.getPwd()))) {
-			System.out.println("안녕하세요" + uid +" 님 로그인 되었습니다.");
-			currentMember = findMember;
-			choiceMenuAfterLogin();
-		} else if(findMember != null) {
-			System.out.println("비밀번호 입력 오류");
-			choiceMenu();
+		if (!currentId.equals("")) {
+			System.out.println("현재 로그인된 상태 입니다. 로그인 아이디: " + currentId);
 		} else {
-			System.out.println("존재하지 않는 사용자 입니다.");
-			choiceMenu();
+			System.out.println("[로그인]");
+			System.out.println("아이디 >>> ");
+			String uid = scanner.next();
+			System.out.println("비밀번호 >>> ");
+			String pwd = scanner.next();
+			
+			// 찾을 ID를 서버로 전송하여 가입여부 확인 JSONObject 객체를 생성합니다.
+			JSONObject jsonObject = new JSONObject();
+			JSONObject memberInfo = new JSONObject();
+			memberInfo.put("uid", uid);
+			memberInfo.put("pwd", pwd);
+			jsonObject.put("command", "checkMemberInfo");
+			jsonObject.put("data", memberInfo);
+			
+			System.out.println("checkMemberInfo json 변환 확인 : " + jsonObject.toString());
+			
+			// 서버로 JSON 객체 전송
+			connectedMember.send(jsonObject);
 		}
+		
+		if(currentId.equals("")) {
+			System.out.println("존재하지 않는 사용자 입니다.");
+		} else {
+        	System.out.println("안녕하세요. " + currentId +" 님^^ 로그인 되었습니다!");
+		}
+        
+//        if(currentMember != null) {
+//        	System.out.println("안녕하세요" + uid +" 님^^ 로그인 되었습니다!");
+//        	choiceMenuAfterLogin();
+//        } else if(currentMember == null) {
+//			System.out.println("존재하지 않는 사용자 입니다.");
+//			choiceMenu();
+//        } else {
+//        	System.out.println("로그인 예외 발생");
+//        	choiceMenu();
+//        }
+		
+		
+//		if((findMember != null) && (pwd.equals(findMember.getPwd()))) {
+//			System.out.println("안녕하세요" + uid +" 님 로그인 되었습니다.");
+//			currentMember = findMember;
+//			choiceMenuAfterLogin();
+//		} else if(findMember != null) {
+//			System.out.println("비밀번호 입력 오류");
+//			choiceMenu();
+//		} else {
+//			System.out.println("존재하지 않는 사용자 입니다.");
+//			choiceMenu();
+//		}
 	}
 
 
-	public void displayMenuBeforeLogin() {
+	public void displayMenu() {
+		System.out.println();
+		System.out.println("-------------------------");
+		System.out.println("           Menu          ");
+		System.out.println("-------------------------");
 		System.out.println("1. 회원가입"); // 파일로 저장
 		System.out.println("2. 로그인");
 		System.out.println("3. 비밀번호 찾기");
-		System.out.println("4. 종료");
-		System.out.println("번호를 입력하세요 >>> ");
-	}
-	
-	public void displayMenuAfterLogin() {
-		System.out.println("1. 정보수정");
-		System.out.println("2. 채팅방 생성");
-		System.out.println("3. 채팅방 입장"); // 목록보기
-		System.out.println("4. 회원탈퇴"); 
-		System.out.println("5. 로그아웃"); 
-		System.out.println("번호를 입력하세요 >>> ");
-	}
-	
-	public void displayMenuForManager() {
-		System.out.println("1. 회원목록 보기");
-		System.out.println("2. 로그아웃");
-		
+		System.out.println("4. 정보수정");
+		System.out.println("5. 채팅방 생성");
+		System.out.println("6. 채팅방 입장");
+		System.out.println("7. 회원탈퇴"); // 목록보기
+		System.out.println("8. 모든 회원목록 보기"); 
+		System.out.println("9. 로그아웃"); 
+		System.out.println("10. 프로그램 종료"); 
+		System.out.println("-------------------------");
+		System.out.print("번호를 입력하세요 >>> ");
 	}
 	
 	public void printRooms() {
@@ -253,49 +312,26 @@ public class MemberManager {
 		System.out.print("성별: ");
 		final String gender = scanner.next();
 		
-		memberMap.put(uid, new Member(uid, name, pwd, age, phoneNumber, address, gender));
+//		memberMap.put(uid, new Member(uid, name, pwd, age, phoneNumber, address, gender));
+		Member newMember = new Member(uid, name, pwd, age, phoneNumber, address, gender, false);
 		System.out.println("회원가입이 완료 되었습니다.");
 		System.out.println(memberMap.toString());
 		System.out.println();
-		memberDB.saveMemberList(memberMap);
-		memberDB.readAllMembers();
 		
-//		saveFileMemberList();
-//		loadFileMemberList();
+//		connectedMember.send("saveMemberList" : "memberMap");
+//		connectedMember.send("printMemberList" : "memberMap");
 		
-	}
-	
-//	public void saveFileMemberList() {
-//		String fileName = "C:/Users/KOSA/Temp/member.db";
-//		File file = new File(fileName);
-//		ObjectOutputStream oos;
-//		try {
-//			oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(fileName)));
-//			oos.writeObject(memberMap);
-//			oos.close();
-//		} catch (IOException e) {
-//			System.out.println("saveFileMemberList" + " 예외발생");
-//		}
-//	}
-//	
-//	public void loadFileMemberList() {
-//		String fileName = "C:/Users/KOSA/Temp/member.db";
-//		File file = new File(fileName);
-//		try {
-//			ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(fileName)));
-//			Map<String, Member> memberMap = (Map<String, Member>) ois.readObject();
-//			Collection<Member> memberList = memberMap.values();
-//			
-//			for(Member m : memberList) {
-//				System.out.println(m.toString());
-//			}
-//			
-//		} catch (Exception e) {
-//			System.out.println("loadFileMemberList" + " 예외발생");
-//			e.printStackTrace();
-//		}
-//		
-//	}
-	
-
+		// memberMap json으로 변환
+        // JSONObject 객체를 생성합니다.
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("command", "saveMember");
+        jsonObject.put("data", newMember);
+        System.out.println("insertMember json 변환 확인 : " + jsonObject.toString());
+		
+        // 서버로 JSON 객체 전송
+        connectedMember.send(jsonObject);
+        
+//		memberDB.saveMemberList(memberMap);
+//		memberDB.readAllMembers();
+}
 }

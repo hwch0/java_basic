@@ -5,8 +5,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +16,8 @@ import java.util.Map.Entry;
 
 import org.json.JSONObject;
 
-import chatting.Member;
+import Member.Member;
+import Member.Room;
 import lombok.Data;
 
 @Data
@@ -28,7 +31,9 @@ public class SocketClient {
 	String chatName;
 	Map<String, Member> memberList;
 	int keyId;
-	static int count = 1;
+	static int count = 1; // 로그인 하지 않은 이용자의 기본키
+	static int roomCnt = 1; // 채팅방 기본키
+	
 	
 	public SocketClient(ChatServer chatServer, Socket socket) {
 		try {
@@ -48,7 +53,7 @@ public class SocketClient {
 			System.out.println(e.getStackTrace());
 		}
 	}
-	// 서버 수신용 스레드 생성 (나중에 json으로)
+	// 서버 수신용 스레드 생성
 	// 서버에서 모든 클라이언트들의 메시지를 수신하고 발신한 사람한테만 전송
 	public void receive() {
 		chatServer.threadPool.execute(() -> {
@@ -62,9 +67,8 @@ public class SocketClient {
 				        // JSONObject 객체를 생성하여 스트링으로 된 JSON을 파싱합니다.
 				        JSONObject jsonObject = new JSONObject(receiveMessage);
 						
-						
+				        // 클라이언트로 부터 전달 받은 command 추출
 						String command = jsonObject.getString("command");
-//						String message = receiveMessage.split(":")[1];
 						System.out.println("command : " + command);
 						
 						switch(command) {
@@ -72,29 +76,12 @@ public class SocketClient {
 						    	
 						    	break;
 							case "saveMember":
-								if(saveMember(jsonObject)) {
-									this.send(makeCommand("saveMember", "complete"));
-								} else {
-									this.send(makeCommand("saveMember", "fail"));
-								}
+								String saveResult = saveMember(jsonObject);
+								this.send(makeCommand("saveMember", saveResult));
 								break;
 							case "login":
-								
 								String loginResult = login(jsonObject);
 								this.send(makeCommand("login", loginResult));
-								
-				
-//								Member result = chatServer.memberDB.checkMemberInfo((JSONObject)jsonObject.get("data"));
-//								JSONObject loginResult = new JSONObject();
-//								loginResult.put("command", "login");
-//								
-//								if(result!=null) {
-//									loginResult.put("data", result.makeJSON().toString());
-//								} else {
-//									loginResult.put("data", "");
-//								}
-//								System.out.println("socketClient - checkMemberInfo : 결과 JSON 객체 확인" + loginResult.toString());
-//								this.send(loginResult);
 								break;
 							case "findPwd" :
 								String findPwdResult = findPwd(jsonObject);
@@ -109,9 +96,15 @@ public class SocketClient {
 							case "updateMember" : 
 								updateMember(jsonObject);
 								this.send(makeCommand("updateMember", true));
+								break;
 							case "deleteMember"	:
 								deleteMember(jsonObject);
 								this.send(makeCommand("deleteMember", true));
+								break;
+							case "createRoom" :
+								createRoom(jsonObject, this);
+								this.send(makeCommand("createRoom", true));
+								break;
 //							case "대화명":
 //								this.chatName = message;
 //								chatServer.sendToAll(this, "님이 들어오셨습니다.");
@@ -135,10 +128,7 @@ public class SocketClient {
 		});
 	}
 	
-	
 
-
-	
 	public Member existMember(String uid) {
 		
 		if (memberList.keySet().stream().anyMatch(m -> m.equals(uid))) {
@@ -149,16 +139,16 @@ public class SocketClient {
 		}
 	}
 	
-	public boolean saveMember(JSONObject jsonObject) {
+	public String saveMember(JSONObject jsonObject) {
 		JSONObject newMemberJson = (JSONObject) jsonObject.get("data");
 		Member newMember = Member.makeMember(newMemberJson);
 		if(existMember(newMember.getUid())==null) {
 			memberList.put(newMember.getUid(), newMember);
 			chatServer.memberDB.saveMemberList(memberList);
-			return true;
+			return "complete";
 		} else {
 			System.out.println("존재하는 아이디 입니다.");
-			return false;
+			return "fail";
 		}
 	}
 	
@@ -183,6 +173,7 @@ public class SocketClient {
 	public void deleteMember(JSONObject jsonObject) {
 		String targetID = jsonObject.getString("data");
 		memberList.remove(targetID);
+		chatServer.memberDB.saveMemberList(memberList);
 	}
 	
 	public void updateMember(JSONObject jsonObject) {
@@ -202,10 +193,21 @@ public class SocketClient {
 	public String login(JSONObject jsonObject) {
 		Member result = chatServer.memberDB.checkMemberInfo((JSONObject)jsonObject.get("data"));
 		if(result!=null) {
-			return result.makeJSON().toString();
+			JSONObject resultJson = result.makeJSON();
+			return resultJson.toString();
 		} else {
 			return "";
 		}
+	}
+	
+	public String createRoom(JSONObject jsonObject, SocketClient socketClient) {
+		String roomName = jsonObject.getString("data");
+		List<SocketClient> roomLeader = null;
+		roomLeader.add(socketClient);
+		Room newRoom = new Room(roomName, roomLeader);
+		chatServer.memberDB.saveRoomList(roomCnt, newRoom);
+		return chatName;
+		
 	}
 	
 	
