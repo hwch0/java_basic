@@ -77,73 +77,41 @@ public class SocketClient {
 								} else {
 									this.send(makeCommand("saveMember", "fail"));
 								}
-								
-//								JSONObject newMemberJson = (JSONObject) jsonObject.get("data");
-//								Member newMember = Member.makeMember(newMemberJson);
-//								memberList.put(newMember.getUid(), newMember);
-//								chatServer.memberDB.saveMemberList(memberList);
-//								chatServer.memberDB.saveMember((JSONObject)jsonObject.get("data"));
-//								saveMemberList(jsonObject.getString("data"));
 								break;
-							case "checkMemberInfo":
-								Member result = chatServer.memberDB.checkMemberInfo((JSONObject)jsonObject.get("data"));
-								JSONObject loginResult = new JSONObject();
-								loginResult.put("command", "login");
+							case "login":
 								
-								if(result!=null) {
-									loginResult.put("data", result.getUid());
-								} else {
-									loginResult.put("data", "");
-								}
-//								System.out.println("member json 변환" + result.makeJSON().toString());
-								System.out.println("socketClient - checkMemberInfo : 결과 JSON 객체 확인" + loginResult.toString());
-								this.send(loginResult);
+								String loginResult = login(jsonObject);
+								this.send(makeCommand("login", loginResult));
+								
+				
+//								Member result = chatServer.memberDB.checkMemberInfo((JSONObject)jsonObject.get("data"));
+//								JSONObject loginResult = new JSONObject();
+//								loginResult.put("command", "login");
+//								
+//								if(result!=null) {
+//									loginResult.put("data", result.makeJSON().toString());
+//								} else {
+//									loginResult.put("data", "");
+//								}
+//								System.out.println("socketClient - checkMemberInfo : 결과 JSON 객체 확인" + loginResult.toString());
+//								this.send(loginResult);
 								break;
 							case "findPwd" :
-								
 								String findPwdResult = findPwd(jsonObject);
 								System.out.println("findPwdResult :" + findPwdResult);
 								this.send(makeCommand("findPwd", findPwdResult));
-								
-//								JSONObject memeberInfo = (JSONObject)jsonObject.get("data");
-//								System.out.println("id :" + memeberInfo.getString("uid"));
-//								System.out.println("phone :" + memeberInfo.getString("phoneNumber"));
-//								
-//								JSONObject findPwdResult = new JSONObject();
-//								findPwdResult.put("command", "findPwd");
-//
-//								Member findMember = existMember(memeberInfo.getString("uid"));
-//								System.out.println("findMember" + findMember.toString());
-//								if (findMember != null) {
-//									if((findMember.getUid().equals(memeberInfo.getString("uid"))) 
-//											&& (findMember.getPhoneNumber().equals(memeberInfo.getString("phoneNumber"))) ) {
-//										findPwdResult.put("data", findMember.getPwd());
-//									} else {
-//										findPwdResult.put("data", "error");
-//									}
-//								} else {
-//									findPwdResult.put("data", "not exist");
-//								}
-//								
-//								this.send(findPwdResult);
-								
-//								String findPassword = chatServer.memberDB.findPassword((JSONObject)jsonObject.get("data"));
-//								JSONObject findPwdResult = new JSONObject();
-//								findPwdResult.put("command", "findPwd");
-//								findPwdResult.put("data", findPassword);
-//								this.send(findPwdResult);
 								break;	
 							case "getAllMembers" :
 								System.out.println("getAllMembers");
 								chatServer.readAllmembers();
 								this.send(makeCommand("printAllMembers", memberList));
-								
-								
-//								JSONObject memberMapResult = new JSONObject();
-//								memberMapResult.put("command", "printAllMembers");
-//								memberMapResult.put("data", memberList);
-//								this.send(memberMapResult);
 								break;
+							case "updateMember" : 
+								updateMember(jsonObject);
+								this.send(makeCommand("updateMember", true));
+							case "deleteMember"	:
+								deleteMember(jsonObject);
+								this.send(makeCommand("deleteMember", true));
 //							case "대화명":
 //								this.chatName = message;
 //								chatServer.sendToAll(this, "님이 들어오셨습니다.");
@@ -168,27 +136,8 @@ public class SocketClient {
 	}
 	
 	
-	// DB CRUD 관련 기능
-	// 1. 회원목록 저장 (회원리스트를 JSON object로 받아서 DB로 저장)
-	public void saveMemberList(String message) {
-		
-        // JSONObject 객체를 생성하여 스트링으로 된 JSON을 파싱합니다.
-        JSONObject jsonObject = new JSONObject(message);
-        
-        
-        // Json을 다시 Map으로 변환해서 파일로 저장해야하는데 우선 JSON을 바로 파일로 저장하겠음
 
-//        // 결과를 저장할 Map 객체를 생성합니다.
-//        Map<String, Member> map = new HashMap<>();
-//
-//        // JSONObject에서 key를 가져와서 각각의 Member 객체를 생성하여 Map에 저장합니다.
-//        for (String key : jsonObject.keySet()) {
-//            JSONObject memberJson = jsonObject.getJSONObject(key);
-//            Member member = new Member(memberJson.getString("name"), memberJson.getInt("age"));
-//            map.put(key, member);
-//        }
-        
-	}
+
 	
 	public Member existMember(String uid) {
 		
@@ -231,11 +180,32 @@ public class SocketClient {
 		}
 	}
 	
+	public void deleteMember(JSONObject jsonObject) {
+		String targetID = jsonObject.getString("data");
+		memberList.remove(targetID);
+	}
+	
+	public void updateMember(JSONObject jsonObject) {
+		JSONObject updatedInfo = new JSONObject(jsonObject.getString("data"));
+		Member updatedMember = Member.makeMember(updatedInfo);
+		memberList.put(updatedMember.getUid(), updatedMember);
+		chatServer.memberDB.saveMemberList(memberList);
+	}
+	
 	public JSONObject makeCommand(String command, Object data) {
 		JSONObject jsonCommand = new JSONObject();
 		jsonCommand.put("command", command);
 		jsonCommand.put("data", data);
 		return jsonCommand;
+	}
+	
+	public String login(JSONObject jsonObject) {
+		Member result = chatServer.memberDB.checkMemberInfo((JSONObject)jsonObject.get("data"));
+		if(result!=null) {
+			return result.makeJSON().toString();
+		} else {
+			return "";
+		}
 	}
 	
 	

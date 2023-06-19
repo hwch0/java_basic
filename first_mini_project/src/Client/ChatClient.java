@@ -76,21 +76,15 @@ public class ChatClient {
 					}
 					
 					case "login" -> {
-						System.out.println("login 함수 실행");
-						
-						String userId = jsonObject.getString("data");
-						currentId = userId;
-						
-//						if(userId.equals("")) {
-//							System.out.println("존재하지 않는 사용자 입니다.");
-//							mm.choiceMenu();
-//						} else {
-//				        	System.out.println("안녕하세요. " + userId +" 님^^ 로그인 되었습니다!");
-//				        	mm.setCurrentId(userId);
-//				    		mm.displayMenu();
-//						}
-						flag = false;
-						System.out.println("login 함수 종료");
+						JSONObject currentMemberJson = new JSONObject(jsonObject.getString("data")) ;
+						System.out.println("currentMemberJson" + currentMemberJson.toString());
+						currentMember = Member.makeMember(currentMemberJson);
+						currentId = currentMember.getUid();
+						if(currentId.equals("")) {
+							System.out.println("존재하지 않는 사용자 입니다.");
+						} else {
+							System.out.println("안녕하세요. " + currentId +" 님^^ 로그인 되었습니다!");
+						}
 					}
 					case "findPwd" -> {
 						System.out.println("findPwd 함수 실행");
@@ -104,13 +98,28 @@ public class ChatClient {
 							System.out.println("비밀번호는 " + pwd + "입니다.");
 							System.out.println("findPwd 함수 종료");
 						}
-						flag = false;
+					}
+					case "updateMember" -> {
+						System.out.println("updateMember 함수 실행");
+						if(jsonObject.getBoolean("data")) {
+							System.out.println("회원정보가 수정 되었습니다.");
+							logout();
+						} else {
+							System.out.println("회원정보 수정중 오류 발생");
+						}
+					}
+					case "deleteMember" -> {
+						System.out.println("deleteMember 함수 실행");
+						if(jsonObject.getBoolean("data")) {
+							System.out.println("정상적으로 탈퇴 되었습니다.");
+						} else {
+							System.out.println("회원 탈퇴 중 오류 발생");
+						}
 					}
 					
 					case "printAllMembers" -> {
 						System.out.println("전체 회원 조회");
 						System.out.println(jsonObject.get("data"));
-						flag = false;
 					}
 					
 					}
@@ -195,7 +204,7 @@ public class ChatClient {
 			JSONObject memberInfo = new JSONObject();
 			memberInfo.put("uid", uid);
 			memberInfo.put("pwd", pwd);
-			jsonObject.put("command", "checkMemberInfo");
+			jsonObject.put("command", "login");
 			jsonObject.put("data", memberInfo);
 			
 			System.out.println("checkMemberInfo json 변환 확인 : " + jsonObject.toString());
@@ -204,11 +213,7 @@ public class ChatClient {
 			send(jsonObject);
 		}
 		
-		if(currentId.equals("")) {
-			System.out.println("존재하지 않는 사용자 입니다.");
-		} else {
-        	System.out.println("안녕하세요. " + currentId +" 님^^ 로그인 되었습니다!");
-		}
+
 	}
 	
 	public void findPwd(Scanner scanner) {
@@ -240,11 +245,11 @@ public class ChatClient {
 	}
 	
 	private void logout() {
+		currentMember = null;
 		currentId = "";
 	}
 	
 	public void memberInfo() {
-		if(currentMember != null) {
 			System.out.println("1. 아이디 : " + currentMember.getUid());
 			System.out.println("2. 이름 : " + currentMember.getName());
 			System.out.println("3. 비밀번호 : " + currentMember.getPwd());
@@ -252,72 +257,76 @@ public class ChatClient {
 			System.out.println("5. 전화번호 : " + currentMember.getPhoneNumber());
 			System.out.println("6. 주소 : " + currentMember.getAddress());
 			System.out.println("7. 성별 : " + currentMember.getGender());
-		} else {
-			System.out.println("로그인 하세요.");
-		}
+			
+			System.out.println("수정을 원하시는 항목의 번호를 입력해주세요. (1~7번)");
+			System.out.println("저장 후 종료를 원하실 경우 8번을 눌러주세요 >>> ");
 	}
 	
 	private void updateInfo(Scanner scanner) {
-		boolean exit = true;
-		while(exit) {
-			System.out.println("[회원정보 수정]");
-			// 현재 정보 출력
-			memberInfo();
-			System.out.println("수정을 원하시는 항목의 번호를 입력해주세요. (1~7번)");
-			System.out.println("저장 후 종료를 원하실 경우 8번을 눌러주세요 >>> ");
-			// 수정하고 싶은 항목 번호 입력
-			int num = scanner.nextInt();
-			switch (num) {
-			case 1 -> {
-				System.out.println("아이디는 수정 불가합니다!!");
-			}
-			case 2 -> {
-				System.out.println("이름 수정 >>> ");
-				String newinfo = scanner.next();
-				currentMember.setName(newinfo);
-			}
-			case 3 -> {
-				System.out.println("비밀번호 수정 >>> ");
-				String newinfo = scanner.next();
-				currentMember.setPwd(newinfo);
-			}
-			case 4 -> {
-				System.out.println("나이 수정 >>> ");
-				int newinfo = scanner.nextInt();
-				currentMember.setAge(newinfo);
-			}
-			case 5 -> {
-				System.out.println("전화번호 수정 >>> ");
-				String newinfo = scanner.next();
-				currentMember.setPhoneNumber(newinfo);
-			}
-			case 6 -> {
-				System.out.println("주소 수정 >>> ");
-				String newinfo = scanner.next();
-				currentMember.setAddress(newinfo);
-			}
-			case 7 -> {
-				System.out.println("성별 수정 >>> ");
-				String newinfo = scanner.next();
-				currentMember.setGender(newinfo);
-			}
-
-			case 8 -> {
+		System.out.println("currentId" + currentId);
+		if(currentId.equals("")) {
+			System.out.println("로그인 하세요");
+		} else {
+			boolean exit = true;
+			while(exit) {
+				System.out.println("[회원정보 수정]");
+				// 현재 정보 출력
+				memberInfo();
+				// 수정하고 싶은 항목 번호 입력
+				int num = scanner.nextInt();
+				switch (num) {
+				case 1 -> {
+					System.out.println("아이디는 수정 불가합니다!!");
+				}
+				case 2 -> {
+					System.out.println("이름 수정 >>> ");
+					String newinfo = scanner.next();
+					currentMember.setName(newinfo);
+				}
+				case 3 -> {
+					System.out.println("비밀번호 수정 >>> ");
+					String newinfo = scanner.next();
+					currentMember.setPwd(newinfo);
+				}
+				case 4 -> {
+					System.out.println("나이 수정 >>> ");
+					int newinfo = scanner.nextInt();
+					currentMember.setAge(newinfo);
+				}
+				case 5 -> {
+					System.out.println("전화번호 수정 >>> ");
+					String newinfo = scanner.next();
+					currentMember.setPhoneNumber(newinfo);
+				}
+				case 6 -> {
+					System.out.println("주소 수정 >>> ");
+					String newinfo = scanner.next();
+					currentMember.setAddress(newinfo);
+				}
+				case 7 -> {
+					System.out.println("성별 수정 >>> ");
+					String newinfo = scanner.next();
+					currentMember.setGender(newinfo);
+				}
 				
-				// memberMap json으로 변환
-		        // JSONObject 객체를 생성합니다.
-		        JSONObject jsonObject = new JSONObject();
-		        jsonObject.put("command", "updateMember");
-		        jsonObject.put("data", currentMember);
-				
-		        // 서버로 JSON 객체 전송
-		        send(jsonObject);
-				
-				System.out.println("수정된 정보가 DB에 반영되었습니다.");
-				exit = false;
-			}
+				case 8 -> {
+					
+					// memberMap json으로 변환
+					// JSONObject 객체를 생성합니다.
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("command", "updateMember");
+					jsonObject.put("data", currentMember.makeJSON().toString());
+					
+					// 서버로 JSON 객체 전송
+					send(jsonObject);
+					
+					System.out.println("수정된 정보가 DB에 반영되었습니다.");
+					exit = false;
+				}
+				}
 			}
 		}
+		
 	}
 	
 	private Object enterChattingRoom(Scanner scanner) {
@@ -385,10 +394,8 @@ public class ChatClient {
 				case 7 -> client1.deleteMember(scanner);
 				case 8 -> client1.printAllmembers(scanner);
 				case 9 -> {
-					exit = false;
 					client1.logout(); 
 					System.out.println("로그아웃 되었습니다.");
-//					choiceMenu();
 				}
 				case 10 -> {
 					try {
