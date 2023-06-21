@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -13,7 +14,6 @@ import org.json.JSONObject;
 
 import Member.Member;
 import Member.Room;
-import chatting.Display;
 import chatting.MemberManager;
 
 
@@ -27,13 +27,11 @@ public class ChatClient {
 	String currentId = "";
 	Member currentMember;
 	
-//	MemberManager mm = new MemberManager(this); // 프로그램 화면 및 멤버관리 메소드 실행
-	
 	// 메소드: 서버 연결 및 메인 메뉴 실행
 	public void connect() {
 		try {
-//			socket = new Socket("192.168.0.147", 50001);
-			socket = new Socket("localhost", 50001);
+			socket = new Socket("192.168.0.147", 50001);
+//			socket = new Socket("localhost", 50001);
 			dis = new DataInputStream(socket.getInputStream());
 			dos = new DataOutputStream(socket.getOutputStream());
 			System.out.println("[클라이언트1] 서버에 연결됨");
@@ -48,7 +46,7 @@ public class ChatClient {
 		
 	}
 	
-	// 메소드: 받기 (나중에 Json으로 바꾸기)
+	// 메소드: 받기 
 	public void receive() {
 		System.out.println("receive 함수 실행");
 		Thread thread = new Thread(() -> {
@@ -65,14 +63,12 @@ public class ChatClient {
 					switch (command) {
 					
 					case "saveMember" -> {
-//						System.out.println("saveMember 함수 실행");
 						if(jsonObject.getString("data").equals("complete")) {
 							System.out.println("회원가입이 완료되었습니다.");
 						} else if(jsonObject.getString("data").equals("fail")) {
 							System.out.println("존재하는 사용자 입니다.");
 						}
 					}
-					
 					case "login" -> {
 						
 						if(jsonObject.getString("data").equals("")) {
@@ -116,7 +112,7 @@ public class ChatClient {
 						} else {
 							System.out.println("회원정보 수정중 오류 발생");
 						}
-						jsonObject.clear();
+//						jsonObject.clear();
 					}
 					
 					case "printAllMembers" -> {
@@ -127,10 +123,18 @@ public class ChatClient {
 //						System.out.println("hashMap"  +hashMap.toString());
 					}
 					case "createRoom" -> {
-						System.out.println("채팅방 만들기");
+						System.out.println("createRoom 함수 실행");
 						
+//						List<String> chatInfo = jsonObject.getJSONArray("data").get;
+						System.out.println("roomName" + jsonObject.getJSONArray("data").getString(0));
+//						System.out.println("roomPort" + jsonObject.getJSONArray("data").getString(1));
+						
+					} 
+					case "printAll" -> {
+						System.out.println("printAll 함수 실행");
+						Map<Integer, Room> allRooms = (Map<Integer, Room>) jsonObject.get("data");
+						System.out.println(allRooms.toString());
 					}
-					
 					}
 					
 				}
@@ -209,9 +213,9 @@ public class ChatClient {
 			System.out.println("현재 로그인된 상태 입니다. 로그인 아이디: " + currentId);
 		} else {
 			System.out.println("[로그인]");
-			System.out.println("아이디 >>> ");
+			System.out.print("아이디 >>> ");
 			String uid = scanner.next();
-			System.out.println("비밀번호 >>> ");
+			System.out.print("비밀번호 >>> ");
 			String pwd = scanner.next();
 			
 			// 찾을 ID를 서버로 전송하여 가입여부 확인 JSONObject 객체를 생성합니다.
@@ -342,7 +346,28 @@ public class ChatClient {
 	}
 	
 	private void enterChattingRoom(Scanner scanner) {
-		// TODO Auto-generated method stub
+		// JSONObject 객체를 생성합니다.
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("command", "printAll");
+		
+		// 서버로 JSON 객체 전송
+		send(jsonObject);
+		
+		// 서버가 전송한 메시지를 받을 json객체 생성
+		String message;
+//		try {
+//			message = dis.readUTF();
+//			JSONObject jsonObject1 = new JSONObject(message);
+//			Map<Integer, Room> allRooms = (Map<Integer, Room>) jsonObject1.get("data");
+//			System.out.println(allRooms.toString());
+//			
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		
+		System.out.println("[채팅방 입장하기]");
+		System.out.print("입장하고 싶은 채팅방 번호를 입력해주세요 >>>");
+		String roomPort = scanner.next();
 	}
 
 	private void createChattingRoom(Scanner scanner) {
@@ -353,11 +378,14 @@ public class ChatClient {
 			System.out.println("[채팅방 만들기]");
 			System.out.print("채팅방 이름을 입력해주세요 >>>");
 			String roomName = scanner.next();
+//			System.out.print("채팅방 포트번호 >>>");
+//			String portNum = scanner.next();
 			
 			// JSONObject 객체를 생성합니다.
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("command", "createRoom");
 			jsonObject.put("data", roomName);
+//			jsonObject.put("port", portNum);
 			
 			// 서버로 JSON 객체 전송
 			send(jsonObject);
@@ -442,7 +470,7 @@ public class ChatClient {
 			boolean exit = true;
 			
 			while(exit) {
-				Display.displayMenu();;
+				Display.displayMenu();
 				int num = scanner.nextInt();
 				switch (num) {
 				case 1 -> client1.insertMember(scanner); 

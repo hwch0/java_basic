@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -21,7 +22,8 @@ import Member.Room;
 import lombok.Data;
 
 @Data
-public class SocketClient {
+public class SocketClient implements Serializable {
+	private static final long serialVersionUID = 7061016713042652922L;
 	// 필드
 	ChatServer chatServer; 
 	Socket socket;
@@ -102,8 +104,13 @@ public class SocketClient {
 								this.send(makeCommand("deleteMember", true));
 								break;
 							case "createRoom" :
-								createRoom(jsonObject, this);
-								this.send(makeCommand("createRoom", true));
+								List<String> chatInfo = createRoom(jsonObject, this);
+								Map<Integer, Room> allRooms = chatServer.chatRooms;
+								this.send(makeCommand("createRoom", chatInfo));
+								break;
+							case "printAll" :
+								Map<Integer, Room> Rooms = printAll();
+								this.send(makeCommand("printAll", Rooms));
 								break;
 //							case "대화명":
 //								this.chatName = message;
@@ -200,14 +207,29 @@ public class SocketClient {
 		}
 	}
 	
-	public String createRoom(JSONObject jsonObject, SocketClient socketClient) {
+	public List<String> createRoom(JSONObject jsonObject, SocketClient socketClient) {
 		String roomName = jsonObject.getString("data");
-		List<SocketClient> roomLeader = null;
-		roomLeader.add(socketClient);
-		Room newRoom = new Room(roomName, roomLeader);
-		chatServer.memberDB.saveRoomList(roomCnt, newRoom);
-		return chatName;
 		
+		List<SocketClient> member = new ArrayList<>();
+		
+		member.add(socketClient);
+		
+		Room newRoom = new Room(roomName, member);
+		
+		System.out.print("newRoom " + newRoom);
+		
+		chatServer.chatRooms.put(roomCnt, newRoom);
+		
+		roomCnt++;
+		List<String> roomInfo = new ArrayList<>();
+		roomInfo.add(roomName);
+		return roomInfo;
+		
+	}
+	
+	public Map<Integer, Room> printAll() {
+		Map<Integer, Room> allRooms = chatServer.chatRooms;
+		return allRooms;
 	}
 	
 	

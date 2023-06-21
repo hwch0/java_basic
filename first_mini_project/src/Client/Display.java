@@ -1,8 +1,15 @@
-package chatting;
+package Client;
 
 import java.util.Scanner;
 
 public class Display {
+	
+	public static void chatting() {
+		System.out.println();
+		System.out.println("----------------------------------");
+		System.out.println("           ChattingRoom          ");
+		System.out.println("----------------------------------");
+	}
 	
 	public static void displayMenu() {
 		System.out.println();
