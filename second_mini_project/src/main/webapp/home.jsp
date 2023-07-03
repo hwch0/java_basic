@@ -1,3 +1,5 @@
+<%@ page language="java" contentType="text/html; charset=EUC-KR"
+    pageEncoding="EUC-KR"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -14,48 +16,52 @@
 				</a>
 			</div>
 			<nav>
+				<ul id="topInfo">
+					<li><button><a href="index.jsp">·Î±×¾Æ¿ô</a></button></li>
+					<li>¾È³çÇÏ¼¼¿ä ${loginMember.name} È¸¿ø´Ô </li>
+				</ul>
 				<ul id="topMenu">
-					<li><a href="#">ë‹¨ì²´ ì—¬í–‰<span>â–¼</span></a>
+					<li><a href="#">´ÜÃ¼ ¿©Çà<span>¡å</span></a>
 						<ul>
-							<li><a href="#">íšŒì‚¬ ì—°ìˆ˜</a></li>
-							<li><a href="#">ìˆ˜í•™ ì—¬í–‰</a></li>
+							<li><a href="#">È¸»ç ¿¬¼ö</a></li>
+							<li><a href="#">¼öÇÐ ¿©Çà</a></li>
 						</ul></li>
-					<li><a href="#">ë§žì¶¤ ì—¬í–‰<span>â–¼</span></a>
+					<li><a href="#">¸ÂÃã ¿©Çà<span>¡å</span></a>
 						<ul>
-							<li><a href="#">4.3 í‰í™” ê¸°í–‰</a></li>
-							<li><a href="#">ê³¶ìžì™ˆ ì²´í—˜</a></li>
-							<li><a href="#">ížë§ ì›Œí¬ìˆ</a></li>
+							<li><a href="#">4.3 ÆòÈ­ ±âÇà</a></li>
+							<li><a href="#">°ùÀÚ¿Ð Ã¼Çè</a></li>
+							<li><a href="#">Èú¸µ ¿öÅ©¼ó</a></li>
 						</ul></li>
-					<li><a href="member/loginForm.html">ë¡œê·¸ì¸</a>
-					<li><a href="member/insertMember.html">íšŒì›ê°€ìž…</a>
+					<li><a href="member/mypage.html">¸¶ÀÌÆäÀÌÁö</a>
+					<li><a href="member/managerPage.html">°ü¸®ÀÚÆäÀÌÁö</a>
 				</ul>
 			</nav>
 		</header>
 		<div id="slideShow">
 			<div id="slides">
-				<img src="images/photo-1.jpg" alt=""> 
-				<img src="images/photo-2.jpg" alt=""> 
-				<img src="images/photo-3.jpg" alt="">
+				<img src="images/photo-1.jpg" alt=""> <img
+					src="images/photo-2.jpg" alt=""> <img
+					src="images/photo-3.jpg" alt="">
 			</div>
 		</div>
 		<div id="contents">
 			<div id="tabMenu">
 				<input type="radio" id="tab1" name="tabs" checked> <label
-					for="tab1">ê³µì§€ì‚¬í•­</label> <input type="radio" id="tab2" name="tabs">
-				<label for="tab2">ê°¤ëŸ¬ë¦¬</label>
+					for="tab1">°øÁö»çÇ×</label> <input type="radio" id="tab2" name="tabs">
+				<label for="tab2">°¶·¯¸®</label>
 
 				<div id="notice" class="tabContent">
-					<h2>ê³µì§€ì‚¬í•­ ë‚´ìš©ìž…ë‹ˆë‹¤.</h2>
+					<h2>°øÁö»çÇ× ³»¿ëÀÔ´Ï´Ù.</h2>
 					<ul>
-						<li>ì‚¬ë¬´ì‹¤ì„ ì´ì „í–ˆìŠµë‹ˆë‹¤.</li>
-						<li>[ì°¸ê°€ ëª¨ì§‘] ì¹´ì•½ ì²´í—˜ì— ì´ˆëŒ€í•©ë‹ˆë‹¤.</li>
-						<li>[ì°¸ê°€ ëª¨ì§‘] ì—¬ë¦„ ë°©í•™ ê¸°ê°„, ì˜¤ë¦„ ì²´í—˜ë‹¨ì„ ëª¨ì§‘í•©ë‹ˆë‹¤.</li>
-						<li>ê²¨ìš¸, ì¶”ì²œ ì—¬í–‰ì§€</li>
-						<li>ê°€ì„, ì¶”ì²œ ì—¬í–‰ì§€</li>
+						<li>»ç¹«½ÇÀ» ÀÌÀüÇß½À´Ï´Ù.</li>
+						<li>[Âü°¡ ¸ðÁý] Ä«¾à Ã¼Çè¿¡ ÃÊ´ëÇÕ´Ï´Ù.</li>
+						<li>[Âü°¡ ¸ðÁý] ¿©¸§ ¹æÇÐ ±â°£, ¿À¸§ Ã¼Çè´ÜÀ» ¸ðÁýÇÕ´Ï´Ù.</li>
+						<li>°Ü¿ï, ÃßÃµ ¿©ÇàÁö</li>
+						<li>°¡À», ÃßÃµ ¿©ÇàÁö</li>
 					</ul>
 				</div>
 				<div id="gallery" class="tabContent">
-					<h2>ê°¤ëŸ¬ë¦¬ ë‚´ìš©ìž…ë‹ˆë‹¤.</h2>
+					<h2>°¶·¯¸® ³»¿ëÀÔ´Ï´Ù.</h2>
 					<ul>
 						<li><img src="images/img-1.jpg"></li>
 						<li><img src="images/img-2.jpg"></li>
@@ -70,13 +76,13 @@
 			<div id="links">
 				<ul>
 					<li><a href="#"> <span id="quick-icon1"></span>
-							<p>í‰í™”ê¸°í–‰</p>
+							<p>ÆòÈ­±âÇà</p>
 					</a></li>
 					<li><a href="#"> <span id="quick-icon2"></span>
-							<p>ížë§ ì›Œí¬ìˆ</p>
+							<p>Èú¸µ ¿öÅ©¼ó</p>
 					</a></li>
 					<li><a href="#"> <span id="quick-icon3"></span>
-							<p>ë¬¸ì˜í•˜ê¸°</p>
+							<p>¹®ÀÇÇÏ±â</p>
 					</a></li>
 
 				</ul>
@@ -85,10 +91,10 @@
 		<footer>
 			<div id="bottomMenu">
 				<ul>
-					<li><a href="#">íšŒì‚¬ì†Œê°œ</a></li>
-					<li><a href="#">ê°œì¸ì •ë³´ì²˜ë¦¬ë°©ì¹¨</a></li>
-					<li><a href="#">ì—¬í–‰ì•½ê´€</a></li>
-					<li><a href="#">ì‚¬ì´íŠ¸ë§µ</a></li>
+					<li><a href="#">È¸»ç¼Ò°³</a></li>
+					<li><a href="#">°³ÀÎÁ¤º¸Ã³¸®¹æÄ§</a></li>
+					<li><a href="#">¿©Çà¾à°ü</a></li>
+					<li><a href="#">»çÀÌÆ®¸Ê</a></li>
 				</ul>
 				<div id="sns">
 					<ul>
@@ -99,7 +105,7 @@
 				</div>
 			</div>
 			<div id="company">
-			<p>ì œì£¼íŠ¹ë³„ìžì¹˜ë„ ***ë™ ***ë¡œ *** (ëŒ€í‘œì „í™”) 123-456-7890</p>
+			<p>Á¦ÁÖÆ¯º°ÀÚÄ¡µµ ***µ¿ ***·Î *** (´ëÇ¥ÀüÈ­) 123-456-7890</p>
 			</div>
 
 
