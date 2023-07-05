@@ -23,7 +23,7 @@ if(loginMember==null) {
 %>
 		<header>
 			<div id="logo">
-				<a href="index.html">
+				<a href="index.jsp">
 					<h1>Dream Jeju</h1>
 				</a>
 			</div>
@@ -48,7 +48,7 @@ if(loginMember==null) {
 
 
 <% }  else { 
-		System.out.println(loginMember.toString());
+	boolean membertype = loginMember.getType();
 %>
 		<header>
 			<div id="logo">
@@ -74,8 +74,9 @@ if(loginMember==null) {
 							<li><a href="#">곶자왈 체험</a></li>
 							<li><a href="#">힐링 워크숍</a></li>
 						</ul></li>
-					<li><a href="member/mypage.html">마이페이지</a>
-					<li><a href="member/managerPage.html">관리자페이지</a>
+					<li><a href="member/mypage.jsp">마이페이지</a>
+					<li><a href="member/managerPage.jsp" onclick="return checkManager()">관리자페이지</a>
+					<input id="memberType" value="<%=membertype %>" style="visibility:hidden" />
 				</ul>
 			</nav>
 		</header>
@@ -91,12 +92,12 @@ if(loginMember==null) {
 		</div>
 		<div id="contents">
 			<div id="tabMenu">
-				<input type="radio" id="tab1" name="tabs" checked> <label
-					for="tab1">공지사항</label> <input type="radio" id="tab2" name="tabs">
+				<input type="radio" id="tab1" name="tabs" checked> 
+				<label for="tab1">공지사항</label> 
+				<input type="radio" id="tab2" name="tabs">
 				<label for="tab2">갤러리</label>
 
 				<div id="notice" class="tabContent">
-					<h2>공지사항 내용입니다.</h2>
 					<ul>
 						<li>사무실을 이전했습니다.</li>
 						<li>[참가 모집] 카약 체험에 초대합니다.</li>
@@ -106,7 +107,6 @@ if(loginMember==null) {
 					</ul>
 				</div>
 				<div id="gallery" class="tabContent">
-					<h2>갤러리 내용입니다.</h2>
 					<ul>
 						<li><img src="images/img-1.jpg"></li>
 						<li><img src="images/img-2.jpg"></li>
@@ -165,6 +165,19 @@ if(loginMember==null) {
 		     window.location.href = "member/logout.jsp";
 		  }
 		}
+	function checkManager() {
+		console.log("함수실행")
+		var memberType = document.getElementById("memberType").value;
+		console.log(memberType);
+		if(memberType) {
+			memberTable.style.display="block";
+			return true;
+		} else {
+			alert("관리자만 접근 가능한 메뉴 입니다.");
+			return false;
+			
+		}
+	}
 	</script>
 </body>
 </html>

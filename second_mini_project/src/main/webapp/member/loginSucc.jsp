@@ -1,5 +1,8 @@
-<%@ page language="java" contentType="text/html; charset=EUC-KR"
-    pageEncoding="EUC-KR"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%
+request.setCharacterEncoding("UTF-8");
+%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -11,42 +14,42 @@
 	<div id="container">
 		<header>
 			<div id="logo">
-				<a href="../home.jsp">
+				<a href="../index.jsp">
 					<h1>Dream Jeju</h1>
 				</a>
 			</div>
 			<nav>
 				<ul id="topMenu">
-					<li><a href="#">´ÜÃ¼ ¿©Çà<span>¡å</span></a>
+					<li><a href="#">ë‹¨ì²´ ì—¬í–‰<span>â–¼</span></a>
 						<ul>
-							<li><a href="#">È¸»ç ¿¬¼ö</a></li>
-							<li><a href="#">¼öÇÐ ¿©Çà</a></li>
+							<li><a href="#">íšŒì‚¬ ì—°ìˆ˜</a></li>
+							<li><a href="#">ìˆ˜í•™ ì—¬í–‰</a></li>
 						</ul></li>
-					<li><a href="#">¸ÂÃã ¿©Çà<span>¡å</span></a>
+					<li><a href="#">ë§žì¶¤ ì—¬í–‰<span>â–¼</span></a>
 						<ul>
-							<li><a href="#">4.3 ÆòÈ­ ±âÇà</a></li>
-							<li><a href="#">°ùÀÚ¿Ð Ã¼Çè</a></li>
-							<li><a href="#">Èú¸µ ¿öÅ©¼ó</a></li>
+							<li><a href="#">4.3 í‰í™” ê¸°í–‰</a></li>
+							<li><a href="#">ê³¶ìžì™ˆ ì²´í—˜</a></li>
+							<li><a href="#">ížë§ ì›Œí¬ìˆ</a></li>
 						</ul></li>
-					<li><a href="loginForm.html">·Î±×ÀÎ</a>
-					<li><a href="insertMember.html">È¸¿ø°¡ÀÔ</a>
+					<li><a href="loginForm.html">ë¡œê·¸ì¸</a>
+					<li><a href="insertMember.html">íšŒì›ê°€ìž…</a>
 				</ul>
 			</nav>
 		</header>
 		<div id="formList">
 			<h1>Login Success</h1> <br/>
 		    <p>${message}</p> <br/>
-		    <p>${loginMember.name} È¸¿ø´Ô</p> <br/>
+		    <p>${loginMember.name} íšŒì›ë‹˜</p> <br/>
 		    <button id="home"><a href="../index.jsp" style="color: white">HOME</a></button>
 		</div>
 		
 		<footer>
 			<div id="bottomMenu">
 				<ul>
-					<li><a href="#">È¸»ç¼Ò°³</a></li>
-					<li><a href="#">°³ÀÎÁ¤º¸Ã³¸®¹æÄ§</a></li>
-					<li><a href="#">¿©Çà¾à°ü</a></li>
-					<li><a href="#">»çÀÌÆ®¸Ê</a></li>
+					<li><a href="#">íšŒì‚¬ì†Œê°œ</a></li>
+					<li><a href="#">ê°œì¸ì •ë³´ì²˜ë¦¬ë°©ì¹¨</a></li>
+					<li><a href="#">ì—¬í–‰ì•½ê´€</a></li>
+					<li><a href="#">ì‚¬ì´íŠ¸ë§µ</a></li>
 				</ul>
 				<div id="sns">
 					<ul>
@@ -57,10 +60,8 @@
 				</div>
 			</div>
 			<div id="company">
-			<p>Á¦ÁÖÆ¯º°ÀÚÄ¡µµ ***µ¿ ***·Î *** (´ëÇ¥ÀüÈ­) 123-456-7890</p>
+			<p>ì œì£¼íŠ¹ë³„ìžì¹˜ë„ ***ë™ ***ë¡œ *** (ëŒ€í‘œì „í™”) 123-456-7890</p>
 			</div>
-
-
 		</footer>
 	</div>
 

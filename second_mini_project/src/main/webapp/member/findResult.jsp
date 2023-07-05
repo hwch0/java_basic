@@ -1,3 +1,8 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%
+request.setCharacterEncoding("UTF-8");
+%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -32,16 +37,10 @@
 			</nav>
 		</header>
 		<div id="formList">
-			<h1>로그인 양식</h1>
-			<form action="login.jsp" method="post" autocomplete="off" >
-				<label for="uid">아이디 : </label>
-				<input id="uid" type="text" name="uid" size="40" maxlength="8"/><br/>
-				비번 : <input type="password" name="pwd"/><br/>
-				<button type="submit">로그인</button>
-				<!-- <button type="reset">초기화</button> -->
-				<button id="findInfo"><a href="findInfo.jsp" style="color: white">ID/PW 찾기</a></button>
-				<button id="join"><a href="insertMember.html" style="color: white">회원가입</a></button>
-			</form>
+			<h1>${message}</h1> <br/>
+		    <p>${result}</p> <br/>
+		    <button id="home"><a href="../index.jsp" style="color: white">HOME</a></button>
+		    <button id="login"><a href="loginForm.html" style="color: white">로그인</a></button>
 		</div>
 		
 		<footer>

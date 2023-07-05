@@ -42,6 +42,11 @@ header {
 
 
 }
+#formList h1 {
+	margin-bottom: 10px;
+	text-align: center;
+
+}
 #formList input {
 	width: 100%;
 	box-sizing: border-box;
@@ -362,4 +367,129 @@ footer {
 p {
 	font-size: 14px;
 	color: #aaa;
+}
+
+#myPage {
+	width: 100%;
+	height: 500px;
+	margin-top: 200px;
+}
+
+#myPageMenu {
+	margin: auto;
+	width: 800px; /*너비*/
+	height: 100%; /*높이*/
+	margin-top: 15px;
+}
+
+#myPageMenu ul {
+	padding:0; /*패딩*/
+	overflow: hidden; /*넘치는 항목은 감춤*/ 
+}
+
+#myPageMenu ul li {
+	float: left; /*가로로 배치*/
+	width: 50%; /*세 항목의 영역을 균일하게 지정*/
+	text-align: center; /*가운데 정렬*/
+	margin: 10px 0; /*마진*/
+}
+
+#myPageMenu ul li a span {
+	display: block; /*블록 레벨로 지정 */
+	margin: 0 auto; /*가운데 배치*/
+	width: 150px; /*가로 크기*/
+	height: 150px; /*세로 크기*/
+	border-radius: 100%; /*테두리를 둥글게 지정. border-radius: 150px*/
+	border: 1px solid #ddd; /*테두리 스타일*/
+	line-height: 150px; /*수직으로 중간에 오게 (block의 세로 사이즈와 동일하게 설정*/
+}
+
+
+#myPageMenu ul li a p {
+	margin-top: 15px; /*위쪽 마진*/
+	font-weight:600; /*폰트 굵기*/
+	color: #666; /*폰트 색상*/
+}
+
+#myPage-icon1 {
+	background-image: url('../images/icon-1.jpg');
+}
+#myPage-icon2 {
+	background-image: url('../images/icon-2.jpg');
+}
+
+
+/*아이디 비번찾기 메뉴 영역*/
+
+#findMenu {
+	width: 600px; /*너비*/
+	height: 500px; /*높이*/
+	margin: 50px auto 50px auto;
+}
+
+#findMenu input[type="radio"] {
+	display: none; /*라디오 버튼 감춤*/
+}
+
+#findMenu label { /*탭 제목 스타일*/
+	display: inline-block; /* 탭을 가로로 배치*/
+	width: 49%;
+	margin: 0 0; /*마진*/
+	padding: 15px 25px; /*패딩*/
+	font-weight: 600; /*폰트 굵기*/
+	text-align: center; /*폰트 정렬*/
+	color: #aaa; /*폰트 색상*/
+	border: 1px solid transparent; /*테두리 스타일*/
+}
+
+#findMenu label:hover { /* 마우스 포인터를 올렸을 때 탭 제목 스타일*/
+	color:#222;
+	cursor: pointer;
+}
+
+#findMenu input:checked + label { /*활성화된 탭 제목 스타일*/
+	color: #b00;
+	border: 1px solid #ddd;
+	background-color: #eee;
+}
+
+.findContent { 
+	width: 100%;
+	height:80%;
+	border-top: 1px solid #ddd;
+}
+
+#findPwd {
+	display: none;
+}
+
+
+.findContent > #formList {
+	margin: 10px auto 10px auto;
+	height: 400px;
+	width: 500px;
+	padding: 25px;
+	border-radius: 5px;
+/* 	background-color: #f5f5f5;
+	box-shadow: 0 0 25px rgba(0,0,0,0.2); */
+    position:relative;
+}
+
+table {
+	margin: 10px auto;
+	border-collapse: collapse;
+  	width: 100%;
+}
+
+/* #tableName {
+	margin-top: 20px;
+} */
+th, td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f2f2f2;
 }

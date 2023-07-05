@@ -7,6 +7,9 @@
 <%@page import="java.io.File"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%
+request.setCharacterEncoding("UTF-8");
+%>
 
 <%
 String uid = request.getParameter("uid");
@@ -23,13 +26,13 @@ System.out.println(memberList);
 Optional<Member> optionalMember = memberList.stream().filter(m -> m.getUid().equals(uid) && m.getPwd().equals(pwd)).findFirst();
 if(optionalMember.isPresent()) {
 	session.setAttribute("loginMember", optionalMember.get());
-	message= "로그인 성공";
+	request.setAttribute("message", "로그인 성공");
+	request.getRequestDispatcher("loginSucc.jsp").forward(request, response);
 } else {
-	message = "아이디 또는 비밀번호가 잘못되었습니다.";
+	request.setAttribute("message", "아이디 또는 비밀번호가 잘못되었습니다.");
+	request.getRequestDispatcher("loginFail.jsp").forward(request, response);
 }
 
-request.setAttribute("message", message);
-request.getRequestDispatcher("loginSucc.jsp").forward(request, response);
 %>
 
 <%-- 
